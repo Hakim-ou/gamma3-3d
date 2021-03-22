@@ -66,6 +66,10 @@ function init() {
 			}
 	);
 
+	var offZ = 1.78;
+    for (var i = 0; i < 14; i++)
+         loadTiroir(loader, i*offZ);
+
 	loadTiroir(loader);
 
 	// lights
@@ -130,7 +134,8 @@ function loadTiroir(loader) {
 	    function (collada) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
-			for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
+			collada.addEventListener(MouseEvent.MOUSE_DOWN, closeDrawer);
+			//for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
 
 			//console.log('long ' + collada.scene.children.length);
 	    },
@@ -139,4 +144,8 @@ function loadTiroir(loader) {
 	        console.log('tiroir ' + (xhr.loaded / xhr.total * 100) + '% loaded');
 	    }
 	);
+}
+
+function closeDrawer(collada) {
+	collada.scene.rotation.y = 0;
 }
