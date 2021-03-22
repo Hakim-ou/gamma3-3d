@@ -138,9 +138,7 @@ function loadTiroir(loader, height) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
             collada.scene.position.y -= height;
-			//for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
-
-			//console.log('long ' + collada.scene.children.length);
+			collada.scene.closed = false;
 			drawers.push(collada.scene);
 	    },
 	    // Function called when download progresses
@@ -150,15 +148,23 @@ function loadTiroir(loader, height) {
 	);
 }
 
+function triggerDrawer(scene){
+	if(scene.closed)
+		openDrawer(scene);
+	else
+		closeDrawer(scene);
+}
+
 function closeDrawer(scene) {
 	scene.rotation.z = 3.14;
+	scene.closed = true;
 }
 
 function openDrawer(scene) {
 	scene.rotation.z = 0;
+	scene.closed = false;
 }
 
-var close = true;
 
 function onClick2(e) {
 	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
@@ -185,23 +191,21 @@ function onClick(e){
 
 	raycaster.setFromCamera(mouse, camera);
 
-	let drawersChildren = []
-	// TODO: Find an other way of doing this => we should use the scene's children instead (scene.children var)
-
-	// Get all drawers children into one array
+	// Gather drawers mesh
+	let drawersMesh = [];
 	for(let i = 0; i < drawers.length; i++){
-		drawersChildren.push(...drawers[i].scene.children);
+		drawersMesh.push(...drawers[i].children);
 	}
 
-	// calculate objects intersecting the picking ray
-	const intersects = raycaster.intersectObjects( drawersChildren );
+	// calculate drawers intersecting the picking ray
+	const intersects = raycaster.intersectObjects( drawersMesh );
 
 	if(intersects.length){ // If we have intersections
-		// Index 0 is the closest object
-		intersects[0].object.material[0].color.set( 0xff0000 ); // Highlight in red
-		console.log("box detected:", intersects[0])
-		// To get the parent => use object.parent :)
+		// Index 0 is the closest drawer
+		let drawer = intersects[0].object;
+		// Trigger it
+		triggerDrawer(drawer);
 	}
 }
 
-document.addEventListener("click", onClick2);
+document.addEventListener("click", onClick);
