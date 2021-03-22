@@ -5,6 +5,8 @@ import { ColladaLoader } from './lib/ColladaLoader.js';
 var camera, controls, scene, renderer;
 var objects = [], bull2Scene, offY = - 20;
 var drawers = [];
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
 
 init();
 //render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -63,13 +65,15 @@ function init() {
 			},
 			// Function called when download progresses
 			function (xhr) {
-					console.log('panneau ' + (xhr.loaded / xhr.total * 100) + '% loaded');
+					//console.log('panneau ' + (xhr.loaded / xhr.total * 100) + '% loaded');
 			}
 	);
 
 	var offZ = 1.78;
     for (var i = 0; i < 14; i++)
-         loadTiroir(loader, i*offZ);
+		 loadTiroir(loader, i*offZ);
+		
+	console.log(drawers);
 
 	// lights
 
@@ -95,10 +99,10 @@ function onWindowResize() {
 }
 
 function animate() {
-	console.log("animate started..");
+	//console.log("animate started..");
 	requestAnimationFrame( animate );
 	controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
-console.log(camera.position) ;
+	//console.log(camera.position) ;
 	render();
 }
 
@@ -120,7 +124,7 @@ function loadCarcass(loader) {
 	    },
 	    // Function called when download progresses
 	    function (xhr) {
-	        console.log('carcass ' + (xhr.loaded / xhr.total * 100) + '% loaded');
+	        //console.log('carcass ' + (xhr.loaded / xhr.total * 100) + '% loaded');
 	    }
 	);
 }
@@ -134,7 +138,7 @@ function loadTiroir(loader, height) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
             collada.scene.position.y -= height;
-			collada.addEventListener(MouseEvent.MOUSE_DOWN, closeDrawer);
+			//collada.addEventListener(MouseEvent.MOUSE_DOWN, closeDrawer);
 			//for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
 
 			//console.log('long ' + collada.scene.children.length);
@@ -142,7 +146,7 @@ function loadTiroir(loader, height) {
 	    },
 	    // Function called when download progresses
 	    function (xhr) {
-	        console.log('tiroir ' + (xhr.loaded / xhr.total * 100) + '% loaded');
+	        //console.log('tiroir ' + (xhr.loaded / xhr.total * 100) + '% loaded');
 	    }
 	);
 }
@@ -150,3 +154,29 @@ function loadTiroir(loader, height) {
 function closeDrawer(collada) {
 	collada.scene.rotation.y = 0;
 }
+
+function onClick(e){
+	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+	raycaster.setFromCamera(mouse, camera);
+
+	let drawersChildren = []
+	// TODO: Find an other way of doing this => we should use the scene's children instead (scene.children var)
+
+	// Get all drawers children into one array
+	for(let i = 0; i < drawers.length; i++){
+		drawersChildren.push(...drawers[i].scene.children);
+	}
+
+	// calculate objects intersecting the picking ray
+	const intersects = raycaster.intersectObjects( drawersChildren );
+
+	if(intersects.length){ // If we have intersections
+		// Index 0 is the closest object
+		intersects[0].object.material[0].color.set( 0xff0000 ); // Highlight in red
+		// To get the parent => use object.parent :)
+	}
+}
+
+document.addEventListener("click", onClick);
