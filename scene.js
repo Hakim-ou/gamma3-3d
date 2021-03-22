@@ -138,11 +138,10 @@ function loadTiroir(loader, height) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
             collada.scene.position.y -= height;
-			//collada.addEventListener(MouseEvent.MOUSE_DOWN, closeDrawer);
 			//for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
 
 			//console.log('long ' + collada.scene.children.length);
-			drawers.push(collada);
+			drawers.push(collada.scene);
 	    },
 	    // Function called when download progresses
 	    function (xhr) {
@@ -151,8 +150,33 @@ function loadTiroir(loader, height) {
 	);
 }
 
-function closeDrawer(collada) {
-	collada.scene.rotation.y = 0;
+function closeDrawer(scene) {
+	scene.rotation.z = 3.14;
+}
+
+function openDrawer(scene) {
+	scene.rotation.z = 0;
+}
+
+var close = true;
+
+function onClick2(e) {
+	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+	raycaster.setFromCamera(mouse, camera);
+	for(let i = 0; i < drawers.length; i++) {
+		if (raycaster.ray.isIntersectionBox(new THREE.Box3().setFromObject(drawers[i]))) {
+			if (close) {
+				closeDrawer(drawers[i]);
+				close = false;
+			} else {
+				openDrawer(drawers[i]);
+				close = true;
+			}
+			break;
+		}
+	}
 }
 
 function onClick(e){
@@ -175,8 +199,9 @@ function onClick(e){
 	if(intersects.length){ // If we have intersections
 		// Index 0 is the closest object
 		intersects[0].object.material[0].color.set( 0xff0000 ); // Highlight in red
+		console.log("box detected:", intersects[0])
 		// To get the parent => use object.parent :)
 	}
 }
 
-document.addEventListener("click", onClick);
+document.addEventListener("click", onClick2);
