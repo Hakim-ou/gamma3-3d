@@ -4,6 +4,7 @@ import { ColladaLoader } from './lib/ColladaLoader.js';
 
 var camera, controls, scene, renderer;
 var objects = [], bull2Scene, offY = - 20;
+var drawers = [];
 
 init();
 //render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -70,8 +71,6 @@ function init() {
     for (var i = 0; i < 14; i++)
          loadTiroir(loader, i*offZ);
 
-	loadTiroir(loader);
-
 	// lights
 
 	var light = new THREE.DirectionalLight( 0xffffff );
@@ -126,7 +125,7 @@ function loadCarcass(loader) {
 	);
 }
 
-function loadTiroir(loader) {
+function loadTiroir(loader, height) {
 
 	loader.load( 'tiroir.dae', // Gamma 3 et 
 
@@ -134,10 +133,12 @@ function loadTiroir(loader) {
 	    function (collada) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
+            collada.scene.position.y -= height;
 			collada.addEventListener(MouseEvent.MOUSE_DOWN, closeDrawer);
 			//for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
 
 			//console.log('long ' + collada.scene.children.length);
+			drawers.push(collada);
 	    },
 	    // Function called when download progresses
 	    function (xhr) {
