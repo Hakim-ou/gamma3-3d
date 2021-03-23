@@ -70,7 +70,7 @@ function init() {
 	);
 
 	var offZ = 1.78;
-    for (var i = 0; i < 14; i++)
+    for (var i = 0; i <= 16; i++)
 		 loadTiroir(loader, i*offZ);
 		
 	console.log(drawers);
@@ -119,8 +119,6 @@ function loadCarcass(loader) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
 			for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
-
-			//console.log('long ' + collada.scene.children.length);
 	    },
 	    // Function called when download progresses
 	    function (xhr) {
@@ -136,7 +134,7 @@ function loadTiroir(loader, height) {
 	    // Function when resource is loaded
 	    function (collada) {
 			scene.add(collada.scene) ;
-			collada.scene.position.y += offY ;
+			collada.scene.position.y += offY + 3*1.78;
             collada.scene.position.y -= height;
 			collada.scene.closed = false;
 			drawers.push(collada.scene);
@@ -157,7 +155,7 @@ function triggerDrawer(scene){
 
 async function closeDrawer(scene) {
 	while (scene.rotation.z < 3.14) {
-		scene.rotation.z += 0.01;
+		scene.rotation.z += 0.02;
 		await sleep(1);
 	}
 	scene.closed = true;
@@ -165,7 +163,7 @@ async function closeDrawer(scene) {
 
 async function openDrawer(scene) {
 	while (scene.rotation.z > 0) {
-		scene.rotation.z -= 0.01;
+		scene.rotation.z -= 0.02;
 		await sleep(1);
 	}
 	scene.closed = false;
