@@ -47,7 +47,7 @@ function init() {
 
 	loadCarcass(loader);
 
-	loader.load( 'panneau.dae', // panneau de connexion
+	loader.load( '/js/panneau.dae', // panneau de connexion
 
 			// Function when resource is loaded
 			function (collada) {    // 53 objets
@@ -112,7 +112,7 @@ function render() {
 
 function loadCarcass(loader) {
 
-	loader.load( 'carcasse.dae', // Gamma 3 et 
+	loader.load( '/js/carcasse.dae', // Gamma 3 et 
 
 	    // Function when resource is loaded
 	    function (collada) {
@@ -131,7 +131,7 @@ function loadCarcass(loader) {
 
 function loadTiroir(loader, height) {
 
-	loader.load( 'tiroir.dae', // Gamma 3 et 
+	loader.load( '/js/tiroir.dae', // Gamma 3 et 
 
 	    // Function when resource is loaded
 	    function (collada) {
