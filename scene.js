@@ -155,14 +155,24 @@ function triggerDrawer(scene){
 		closeDrawer(scene);
 }
 
-function closeDrawer(scene) {
-	scene.rotation.z = 3.14;
+async function closeDrawer(scene) {
+	while (scene.rotation.z < 3.14) {
+		scene.rotation.z += 0.01;
+		await sleep(1);
+	}
 	scene.closed = true;
 }
 
-function openDrawer(scene) {
-	scene.rotation.z = 0;
+async function openDrawer(scene) {
+	while (scene.rotation.z > 0) {
+		scene.rotation.z -= 0.01;
+		await sleep(1);
+	}
 	scene.closed = false;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
@@ -173,12 +183,10 @@ function onClick2(e) {
 	raycaster.setFromCamera(mouse, camera);
 	for(let i = 0; i < drawers.length; i++) {
 		if (raycaster.ray.isIntersectionBox(new THREE.Box3().setFromObject(drawers[i]))) {
-			if (close) {
-				closeDrawer(drawers[i]);
-				close = false;
-			} else {
+			if (drawers[i].closed) {
 				openDrawer(drawers[i]);
-				close = true;
+			} else {
+				closeDrawer(drawers[i]);
 			}
 			break;
 		}
