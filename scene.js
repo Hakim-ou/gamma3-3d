@@ -47,7 +47,7 @@ function init() {
 
 	loadCarcass(loader);
 
-	loader.load( 'https://hakim-ou.github.io/gamma3-3d/js/panneau.dae', // panneau de connexion
+	loader.load( 'panneau.dae', // panneau de connexion
 
 			// Function when resource is loaded
 			function (collada) {    // 53 objets
@@ -112,7 +112,7 @@ function render() {
 
 function loadCarcass(loader) {
 
-	loader.load( 'https://hakim-ou.github.io/gamma3-3d/js/carcasse.dae', // Gamma 3 et 
+	loader.load( 'carcasse.dae', // Gamma 3 et 
 
 	    // Function when resource is loaded
 	    function (collada) {
@@ -131,7 +131,7 @@ function loadCarcass(loader) {
 
 function loadTiroir(loader, height) {
 
-	loader.load( 'https://hakim-ou.github.io/gamma3-3d/js/tiroir.dae', // Gamma 3 et 
+	loader.load( 'tiroir.dae', // Gamma 3 et 
 
 	    // Function when resource is loaded
 	    function (collada) {
