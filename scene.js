@@ -67,15 +67,7 @@ function init() {
 			}
 	);
 
-<<<<<<< HEAD
 	loadTiroirs(loader);
-=======
-	var offZ = 1.78;
-    for (var i = 0; i < 14; i++)
-		 loadTiroir(loader, i*offZ);
-		
-	console.log(drawers);
->>>>>>> 3859a72a884f59582b3e74fa9f526a931ef04934
 
 	// lights
 	var light = new THREE.DirectionalLight( 0xffffff );
@@ -132,23 +124,14 @@ function loadTiroirs(loader) {
 	loader.load( 'tiroir.dae', 
 	    // Function when resource is loaded
 	    function (collada) {
-<<<<<<< HEAD
 			for (var i = 0; i <= 16; i++){
 				let drawerClone = collada.scene.clone();
-				console.log(i, drawerClone);
 				scene.add(drawerClone) ;
 				drawerClone.position.y += offY + 3*offTiroir;
 				drawerClone.position.y -= i*offTiroir;
 				drawerClone.closed = false;
 				drawers.push(drawerClone);
 			}		   
-=======
-			scene.add(collada.scene) ;
-			collada.scene.position.y += offY ;
-            collada.scene.position.y -= height;
-			collada.scene.closed = false;
-			drawers.push(collada.scene);
->>>>>>> 3859a72a884f59582b3e74fa9f526a931ef04934
 	    },
 	    // Function called when download progresses
 	    function (xhr) {
