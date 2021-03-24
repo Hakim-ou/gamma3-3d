@@ -129,6 +129,7 @@ function loadTiroirs(loader) {
 				scene.add(drawerClone) ;
 				drawerClone.position.y += offY;
 				drawerClone.position.y -= i*offTiroir;
+				drawerClone.position.x -= 0.3;
 				drawers.push(drawerClone);
 			}		   
 	    },
