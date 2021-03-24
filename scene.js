@@ -7,6 +7,8 @@ var objects = [], bull2Scene, offY = - 20;
 var drawers = [];
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
+let selectedDrawer;
+let mouseDownPos = {x:0,y:0};
 
 init();
 //render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -142,7 +144,7 @@ function loadTiroirs(loader) {
 
 function closeAllDrawers(){
 	for(let i = 0; i < drawers.length; i++){
-		if(!drawers[i].children[0].closed){
+		if(!drawers[i].children[0].rotation.z < 3.14){
 			closeDrawer(drawers[i].children[0]);
 		}
 	}
@@ -150,16 +152,9 @@ function closeAllDrawers(){
 
 function openAllDrawers(){
 	for(let i = 0; i < drawers.length; i++){
-		if(drawers[i].children[0].closed)
+		if(drawers[i].children[0].rotation.z > 0)
 			openDrawer(drawers[i].children[0]);
 	}
-}
-
-function triggerDrawer(scene){
-	if(scene.closed)
-		openDrawer(scene);
-	else
-		closeDrawer(scene);
 }
 
 async function closeDrawer(scene) {
@@ -167,7 +162,6 @@ async function closeDrawer(scene) {
 		scene.rotation.z += 0.02;
 		await sleep(1);
 	}
-	scene.closed = true;
 }
 
 async function openDrawer(scene) {
@@ -175,14 +169,13 @@ async function openDrawer(scene) {
 		scene.rotation.z -= 0.02;
 		await sleep(1);
 	}
-	scene.closed = false;
 }
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
+// Deprecated
 function onClick2(e) {
 	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
@@ -200,7 +193,7 @@ function onClick2(e) {
 	}
 }
 
-function onClick(e){
+function onMouseDown(e){
 	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
@@ -215,15 +208,40 @@ function onClick(e){
 	// calculate drawers intersecting the picking ray
 	const intersects = raycaster.intersectObjects( drawersMesh );
 
-	if(intersects.length){ // If we have intersections
+	if(intersects.length){ // If we have intersections with at least one drawer
 		// Index 0 is the closest drawer
 		let drawer = intersects[0].object;
-		// Trigger it
-		triggerDrawer(drawer);
+		// Disable camera controls (way more convenient)
+		controls.enabled = false;
+		// Enable drawer drag :
+		//	- save the selected drawer
+		// 	- and the mouse down position (so we can update the rotation angle relative to that first mouse touchdown)
+		selectedDrawer = drawer;
+		mouseDownPos={x:e.clientX, y:e.clientY};
 	}
 }
 
-document.addEventListener("click", onClick);
+function onMouseUp(e){
+	// Disable drawer drag
+	selectedDrawer = null;
+	// Enable camera controls
+	controls.enabled = true;
+}
+
+function onMouseMove(e){
+	if(selectedDrawer) {
+		// New z
+		let z = selectedDrawer.rotation.z + (e.clientX - mouseDownPos.x)/1000;
+		// Bornes (0 <= z <= 3.14)
+		z = z > 3.14 ? 3.14 : z;
+		z = z < 0 ? 0 : z;
+		selectedDrawer.rotation.z = z;
+	}
+}
+
+document.addEventListener("mousedown", onMouseDown);
+document.addEventListener("mouseup", onMouseUp);
+document.addEventListener("mousemove", onMouseMove);
 
 document.getElementById("closeDrawersButton").addEventListener("click", closeAllDrawers);
 document.getElementById("openDrawersButton").addEventListener("click", openAllDrawers);
