@@ -120,16 +120,15 @@ function loadCarcass(loader) {
 }
 
 function loadTiroirs(loader) {
-	var offTiroir = 1.78;
+	const offTiroir = 1.8;
 	loader.load( 'tiroir.dae', 
 	    // Function when resource is loaded
 	    function (collada) {
-			for (var i = 0; i <= 13; i++){
+			for (let i = 0; i <= 13; i++){
 				let drawerClone = collada.scene.clone();
 				scene.add(drawerClone) ;
 				drawerClone.position.y += offY;
 				drawerClone.position.y -= i*offTiroir;
-				drawerClone.closed = false;
 				drawers.push(drawerClone);
 			}		   
 	    },
@@ -138,7 +137,21 @@ function loadTiroirs(loader) {
 	        //console.log('tiroir ' + (xhr.loaded / xhr.total * 100) + '% loaded');
 	    }
 	);
+}
 
+function closeAllDrawers(){
+	for(let i = 0; i < drawers.length; i++){
+		if(!drawers[i].children[0].closed){
+			closeDrawer(drawers[i].children[0]);
+		}
+	}
+}
+
+function openAllDrawers(){
+	for(let i = 0; i < drawers.length; i++){
+		if(drawers[i].children[0].closed)
+			openDrawer(drawers[i].children[0]);
+	}
 }
 
 function triggerDrawer(scene){
@@ -150,7 +163,7 @@ function triggerDrawer(scene){
 
 async function closeDrawer(scene) {
 	while (scene.rotation.z < 3.14) {
-		scene.rotation.z += 0.01;
+		scene.rotation.z += 0.02;
 		await sleep(1);
 	}
 	scene.closed = true;
@@ -158,7 +171,7 @@ async function closeDrawer(scene) {
 
 async function openDrawer(scene) {
 	while (scene.rotation.z > 0) {
-		scene.rotation.z -= 0.01;
+		scene.rotation.z -= 0.02;
 		await sleep(1);
 	}
 	scene.closed = false;
@@ -210,3 +223,6 @@ function onClick(e){
 }
 
 document.addEventListener("click", onClick);
+
+document.getElementById("closeDrawersButton").addEventListener("click", closeAllDrawers);
+document.getElementById("openDrawersButton").addEventListener("click", openAllDrawers);
