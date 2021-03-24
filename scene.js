@@ -124,10 +124,10 @@ function loadTiroirs(loader) {
 	loader.load( 'tiroir.dae', 
 	    // Function when resource is loaded
 	    function (collada) {
-			for (var i = 0; i <= 16; i++){
+			for (var i = 0; i <= 13; i++){
 				let drawerClone = collada.scene.clone();
 				scene.add(drawerClone) ;
-				drawerClone.position.y += offY + 3*offTiroir;
+				drawerClone.position.y += offY;
 				drawerClone.position.y -= i*offTiroir;
 				drawerClone.closed = false;
 				drawers.push(drawerClone);
