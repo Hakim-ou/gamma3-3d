@@ -15,7 +15,7 @@ animate();
 function init() {
 	console.log("init started..");
 	scene = new THREE.Scene();
-//	scene.background = new THREE.Color( "lightblue" );
+	//scene.background = new THREE.Color( "lightblue" );
 	//scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
@@ -27,7 +27,6 @@ function init() {
 	camera.position.set( 50, 50, 0 );
 
 	// controls
-
 	controls = new OrbitControls( camera, renderer.domElement );
 
 	//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
@@ -41,7 +40,6 @@ function init() {
 	controls.maxDistance = 300;
 
 	// world
-
   	// instantiate a loader
   	var loader = new ColladaLoader();
 
@@ -69,14 +67,9 @@ function init() {
 			}
 	);
 
-	var offZ = 1.78;
-    for (var i = 0; i <= 16; i++)
-		 loadTiroir(loader, i*offZ);
-		
-	console.log(drawers);
+	loadTiroirs(loader);
 
 	// lights
-
 	var light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 1, 1, 1 );
 	scene.add( light );
@@ -87,7 +80,7 @@ function init() {
 
 	var light = new THREE.AmbientLight( 0x222222 );
 	scene.add( light );
-
+ 
 
 	window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -99,10 +92,8 @@ function onWindowResize() {
 }
 
 function animate() {
-	//console.log("animate started..");
 	requestAnimationFrame( animate );
 	controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
-	//console.log(camera.position) ;
 	render();
 }
 
@@ -112,8 +103,7 @@ function render() {
 
 function loadCarcass(loader) {
 
-	loader.load( 'carcasse.dae', // Gamma 3 et 
-
+	loader.load( 'carcasse.dae',
 	    // Function when resource is loaded
 	    function (collada) {
 			scene.add(collada.scene) ;
@@ -127,23 +117,27 @@ function loadCarcass(loader) {
 	);
 }
 
-function loadTiroir(loader, height) {
-
-	loader.load( 'tiroir.dae', // Gamma 3 et 
-
+function loadTiroirs(loader) {
+	var offTiroir = 1.78;
+	loader.load( 'tiroir.dae', 
 	    // Function when resource is loaded
 	    function (collada) {
-			scene.add(collada.scene) ;
-			collada.scene.position.y += offY + 3*1.78;
-            collada.scene.position.y -= height;
-			collada.scene.closed = false;
-			drawers.push(collada.scene);
+			for (var i = 0; i <= 16; i++){
+				let drawerClone = collada.scene.clone();
+				console.log(i, drawerClone);
+				scene.add(drawerClone) ;
+				drawerClone.position.y += offY + 3*offTiroir;
+				drawerClone.position.y -= i*offTiroir;
+				drawerClone.closed = false;
+				drawers.push(drawerClone);
+			}		   
 	    },
 	    // Function called when download progresses
 	    function (xhr) {
 	        //console.log('tiroir ' + (xhr.loaded / xhr.total * 100) + '% loaded');
 	    }
 	);
+
 }
 
 function triggerDrawer(scene){
