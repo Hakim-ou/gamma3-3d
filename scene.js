@@ -231,11 +231,12 @@ function onMouseUp(e){
 function onMouseMove(e){
 	if(selectedDrawer) {
 		// New z
-		let z = selectedDrawer.rotation.z + (e.clientX - mouseDownPos.x)/1000;
+		let z = selectedDrawer.rotation.z + (e.clientX - mouseDownPos.x)/50;
 		// Bornes (0 <= z <= 3.14)
 		z = z > 3.14 ? 3.14 : z;
 		z = z < 0 ? 0 : z;
 		selectedDrawer.rotation.z = z;
+		mouseDownPos.x = e.clientX;
 	}
 }
 
