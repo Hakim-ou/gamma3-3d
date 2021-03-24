@@ -1,6 +1,6 @@
-import * as THREE from 'lib/three.module.js';
-import { OrbitControls } from 'lib/OrbitControls.js';
-import { ColladaLoader } from 'lib/ColladaLoader.js';
+import * as THREE from './lib/three.module.js';
+import { OrbitControls } from './lib/OrbitControls.js';
+import { ColladaLoader } from './lib/ColladaLoader.js';
 
 var camera, controls, scene, renderer;
 var objects = [], bull2Scene, offY = - 20;
