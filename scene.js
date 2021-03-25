@@ -5,8 +5,10 @@ import { ColladaLoader } from './lib/ColladaLoader.js';
 var camera, controls, scene, renderer;
 var objects = [], bull2Scene, offY = - 20;
 var drawers = [];
+var manette;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
+let selectedObject;
 let selectedDrawer;
 let mouseDownPos = {x:0,y:0};
 let loadingProgress = 0;
@@ -107,7 +109,7 @@ async function loadModels(loader, manager){
 
 function  loadPannel(loader){
 	loadingTopic = "Chargement du panneau";
-	loader.load('panneau.dae', // panneau de connexion
+	loader.load('fix.dae', // panneau de connexion
 			// Function when resource is loaded
 			function (collada) {    // 53 objets
 					scene.add(collada.scene);
@@ -120,6 +122,41 @@ function  loadPannel(loader){
 					collada.scene.rotation.x = 0;
 					collada.scene.rotation.y = 3.14/2;
 					collada.scene.rotation.z = 0;
+			},
+	);
+
+	loader.load('changeable.dae', // panneau de connexion
+			// Function when resource is loaded
+			function (collada) {    // 53 objets
+					scene.add(collada.scene);
+					collada.scene.scale.x = 2.2;
+					collada.scene.scale.y= 2;
+					collada.scene.scale.z = 2;
+					collada.scene.position.x = 8;
+					collada.scene.position.y = 27 + offY;
+					collada.scene.position.z = -10.6;
+					collada.scene.rotation.x = 0;
+					collada.scene.rotation.y = 3.14/2;
+					collada.scene.rotation.z = 0;
+			},
+	);
+
+	loader.load('manette.dae', // manette du panneau de connexion
+			// Function when resource is loaded
+			function (collada) { 
+					scene.add(collada.scene);
+					manette = collada.scene;
+					collada.scene.scale.x = 2.2;
+					collada.scene.scale.y= 2;
+					collada.scene.scale.z = 2;
+					collada.scene.position.x = 8;
+					collada.scene.position.y = 27 + offY;
+					collada.scene.position.z = -10.6;
+					collada.scene.rotation.x = 0;
+					collada.scene.rotation.y = 3.14/2;
+					collada.scene.rotation.z = 0;
+
+					console.log(manette);
 			},
 	);
 }
@@ -211,45 +248,72 @@ function onMouseDown(e){
 
 	raycaster.setFromCamera(mouse, camera);
 
-	// Gather drawers mesh
-	let drawersMesh = [];
+	// Gather objects mesh
+	let objectsMesh = [];
+	if (manette) {
+		objectsMesh.push(...manette.children)
+	}
+
 	for(let i = 0; i < drawers.length; i++){
-		drawersMesh.push(...drawers[i].children);
+		objectsMesh.push(...drawers[i].children);
 	}
 
 	// calculate drawers intersecting the picking ray
-	const intersects = raycaster.intersectObjects( drawersMesh );
+	const intersects = raycaster.intersectObjects( objectsMesh );
 
 	if(intersects.length){ // If we have intersections with at least one drawer
 		// Index 0 is the closest drawer
-		let drawer = intersects[0].object;
+		let object = intersects[0].object;
 		// Disable camera controls (way more convenient)
 		controls.enabled = false;
 		// Enable drawer drag :
 		//	- save the selected drawer
 		// 	- and the mouse down position (so we can update the rotation angle relative to that first mouse touchdown)
-		selectedDrawer = drawer;
+		selectedObject = object;
 		mouseDownPos={x:e.clientX, y:e.clientY};
 	}
 }
 
 function onMouseUp(e){
 	// Disable drawer drag
-	selectedDrawer = null;
+	selectedObject = null;
 	// Enable camera controls
 	controls.enabled = true;
 }
 
 function onMouseMove(e){
-	if(selectedDrawer) {
-		// New z
-		let z = selectedDrawer.rotation.z + (e.clientX - mouseDownPos.x)/50;
-		// Bornes (0 <= z <= 3.14)
-		z = z > 3.14 ? 3.14 : z;
-		z = z < 0 ? 0 : z;
-		selectedDrawer.rotation.z = z;
-		mouseDownPos.x = e.clientX;
+	if(selectedObject) {
+		for (let i=0; i<manette.children.length; i++) { // 10 objects
+			if (Object.is(selectedObject, manette.children[i])) {
+				dragManette(e);
+				return;
+			}
+		}
+		selectedDrawer = selectedObject;
+		dragTiroir(e);
 	}
+}
+
+function dragManette(e) {
+	// New z
+	console.log("dragManette");
+	let z = manette.rotation.z + (e.clientX - mouseDownPos.x)/50;
+	// Bornes (0 <= z <= 3.14)
+	z = z > 3.14 ? 3.14 : z;
+	z = z < 0 ? 0 : z;
+	manette.rotation.z = z;
+	mouseDownPos.x = e.clientX;
+	console.log(manette.rotation);
+}
+
+function dragTiroir(e) {
+	// New z
+	let z = selectedDrawer.rotation.z + (e.clientX - mouseDownPos.x)/50;
+	// Bornes (0 <= z <= 3.14)
+	z = z > 3.14 ? 3.14 : z;
+	z = z < 0 ? 0 : z;
+	selectedDrawer.rotation.z = z;
+	mouseDownPos.x = e.clientX;
 }
 
 document.addEventListener("mousedown", onMouseDown);
