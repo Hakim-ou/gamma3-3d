@@ -87,3 +87,52 @@ body {
 .btn:hover{
 	background-color: rgb(231, 231, 231);
 }
+
+
+
+html, body {
+	overflow: hidden;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#progress-topic{
+	font-family: sans-serif;
+}
+
+#bar{
+	height:100%;
+	background-color:green;
+	border-radius: 0.25em;
+	color:black;
+	width:0%;
+	position: absolute;
+	bottom:0%;
+}
+
+#value{
+	position: relative;
+	z-index: 1;
+	font-family: sans-serif;
+	line-height:2em;
+}
+
+#progress-bar {
+	position:absolute;
+	top:45%;
+	text-align: center;
+	width:33%;
+	left:33%;
+	height:2em;
+	background: white;
+	border-radius: 0.25em;
+	opacity:1;
+	opacity: 1;
+	transition: 0.5s opacity;
+	transform: translateZ(0); 
+}
+
+#progress-bar.fade-out {
+    opacity: 0;
+}

@@ -9,6 +9,8 @@ const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let selectedDrawer;
 let mouseDownPos = {x:0,y:0};
+let loadingProgress = 0;
+let loadingTopic = '';
 
 init();
 //render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -42,34 +44,15 @@ function init() {
 	controls.maxDistance = 300;
 
 	// world
+	// loading manager
+	let manager = new THREE.LoadingManager();
+	manager.onProgress = updateLoadingProgress;
+
   	// instantiate a loader
-  	var loader = new ColladaLoader();
+  	var loader = new ColladaLoader(manager);
 
-	loadCarcass(loader);
 
-	loader.load( 'panneau.dae', // panneau de connexion
-
-			// Function when resource is loaded
-			function (collada) {    // 53 objets
-					scene.add(collada.scene);
-					collada.scene.scale.x = 2.2;
-					collada.scene.scale.y= 2;
-					collada.scene.scale.z = 2;
-					collada.scene.position.x = 8;
-					collada.scene.position.y = 27 + offY;
-					collada.scene.position.z = -10.6;
-					collada.scene.rotation.x = 0;
-					collada.scene.rotation.y = 3.14/2;
-					collada.scene.rotation.z = 0;
-					//console.log('long ' + collada.scene.children.length);
-			},
-			// Function called when download progresses
-			function (xhr) {
-					//console.log('panneau ' + (xhr.loaded / xhr.total * 100) + '% loaded');
-			}
-	);
-
-	loadTiroirs(loader);
+	loadModels(loader, manager);
 
 	// lights
 	var light = new THREE.DirectionalLight( 0xffffff );
@@ -103,25 +86,58 @@ function render() {
 	renderer.render( scene, camera );
 }
 
-function loadCarcass(loader) {
+async function updateLoadingProgress(item, loaded, total){
+	document.getElementById("value").innerHTML = (loaded / total)*100 + '%';
+	document.getElementById("bar").style.width = (loaded / total)*100 + '%';
+	if(loaded == total)
+		removeLoadingScreen();
+}
 
+async function removeLoadingScreen(){	
+	document.getElementById('progress-bar').classList.add('fade-out');
+	await sleep(500); // wait for the fade-out transition to end
+	document.getElementById('progress-bar').remove();
+}
+
+async function loadModels(loader, manager){
+	loadPannel(loader);
+	loadCarcass(loader);
+	loadTiroirs(loader);
+}
+
+function  loadPannel(loader){
+	loadingTopic = "Chargement du panneau";
+	loader.load('panneau.dae', // panneau de connexion
+			// Function when resource is loaded
+			function (collada) {    // 53 objets
+					scene.add(collada.scene);
+					collada.scene.scale.x = 2.2;
+					collada.scene.scale.y= 2;
+					collada.scene.scale.z = 2;
+					collada.scene.position.x = 8;
+					collada.scene.position.y = 27 + offY;
+					collada.scene.position.z = -10.6;
+					collada.scene.rotation.x = 0;
+					collada.scene.rotation.y = 3.14/2;
+					collada.scene.rotation.z = 0;
+			},
+	);
+}
+
+function loadCarcass(loader) {
+	loadingTopic = "Chargement de la carcasse";
 	loader.load( 'carcasse.dae',
 	    // Function when resource is loaded
 	    function (collada) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
 			for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
-
-			//console.log('long ' + collada.scene.children.length);
 	    },
-	    // Function called when download progresses
-	    function (xhr) {
-	        //console.log('carcass ' + (xhr.loaded / xhr.total * 100) + '% loaded');
-	    }
 	);
 }
 
 function loadTiroirs(loader) {
+	loadingTopic = "Chargement des tiroirs";
 	const offTiroir = 1.8;
 	loader.load( 'tiroir.dae', 
 	    // Function when resource is loaded
@@ -133,12 +149,8 @@ function loadTiroirs(loader) {
 				drawerClone.position.y -= i*offTiroir;
 				drawerClone.position.x -= 0.3;
 				drawers.push(drawerClone);
-			}		   
+			}	   
 	    },
-	    // Function called when download progresses
-	    function (xhr) {
-	        //console.log('tiroir ' + (xhr.loaded / xhr.total * 100) + '% loaded');
-	    }
 	);
 }
 
