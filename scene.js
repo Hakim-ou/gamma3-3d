@@ -155,6 +155,7 @@ function  loadPannel(loader){
 					collada.scene.rotation.x = 0;
 					collada.scene.rotation.y = 3.14/2;
 					collada.scene.rotation.z = 0;
+					collada.scene.add(new THREE.AxisHelper(5));
 
 					console.log(manette);
 			},
@@ -297,13 +298,21 @@ function onMouseMove(e){
 function dragManette(e) {
 	// New z
 	console.log("dragManette");
-	let z = manette.rotation.z + (e.clientX - mouseDownPos.x)/50;
+	let z = manette.rotation.x + (e.clientX - mouseDownPos.x)/50;
 	// Bornes (0 <= z <= 3.14)
 	z = z > 3.14 ? 3.14 : z;
 	z = z < 0 ? 0 : z;
-	manette.rotation.z = z;
+	//manette.rotation.x = z;
+	//for (let i=0; i<manette.children.length; i++) {
+	//	manette.children[i].rotation.x = z;
+	//}
+	//let point = new THREE.Vector3(manette.children[5].position.x, manette.children[5].position.y, manette.children[5].position.z);
+	let point = new THREE.Vector3(8, 7 + 7, -10.6);
+				
+	rotateAboutPoint(manette, point, new THREE.Vector3(1, 0, 0), z, false);
+
 	mouseDownPos.x = e.clientX;
-	console.log(manette.rotation);
+	console.log(manette.position);
 }
 
 function dragTiroir(e) {
@@ -315,6 +324,31 @@ function dragTiroir(e) {
 	selectedDrawer.rotation.z = z;
 	mouseDownPos.x = e.clientX;
 }
+
+// obj - your object (THREE.Object3D or derived)
+// point - the point of rotation (THREE.Vector3)
+// axis - the axis of rotation (normalized THREE.Vector3)
+// theta - radian value of rotation
+// pointIsWorld - boolean indicating the point is in world coordinates (default = false)
+function rotateAboutPoint(obj, point, axis, theta, pointIsWorld){
+	console.log(point);
+    pointIsWorld = (pointIsWorld === undefined)? false : pointIsWorld;
+
+    if(pointIsWorld){
+        obj.parent.localToWorld(obj.position); // compensate for world coordinate
+    }
+
+    obj.position.sub(point); // remove the offset
+    obj.position.applyAxisAngle(axis, theta); // rotate the POSITION
+    obj.position.add(point); // re-add the offset
+
+    if(pointIsWorld){
+        obj.parent.worldToLocal(obj.position); // undo world coordinates compensation
+    }
+
+    obj.rotateOnAxis(axis, theta); // rotate the OBJECT
+}
+
 
 document.addEventListener("mousedown", onMouseDown);
 document.addEventListener("mouseup", onMouseUp);
