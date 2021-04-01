@@ -6,6 +6,7 @@ var camera, controls, scene, renderer;
 var objects = [], bull2Scene, offY = - 20;
 var drawers = [];
 var manette;
+var manettePivot;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let selectedObject;
@@ -144,20 +145,32 @@ function  loadPannel(loader){
 	loader.load('manette.dae', // manette du panneau de connexion
 			// Function when resource is loaded
 			function (collada) { 
-					scene.add(collada.scene);
+					//scene.add(collada.scene);
 					manette = collada.scene;
 					collada.scene.scale.x = 2.2;
 					collada.scene.scale.y= 2;
 					collada.scene.scale.z = 2;
-					collada.scene.position.x = 8;
-					collada.scene.position.y = 27 + offY;
-					collada.scene.position.z = -10.6;
+					collada.scene.position.y -= 5.675;
+					collada.scene.position.x = 0.86;
 					collada.scene.rotation.x = 0;
 					collada.scene.rotation.y = 3.14/2;
 					collada.scene.rotation.z = 0;
-					collada.scene.add(new THREE.AxisHelper(5));
 
-					console.log(manette);
+					// Manette pivot
+					const material = new THREE.MeshPhongMaterial({
+						color: null,
+						opacity: 0,
+						transparent: true,
+					  });
+					var geometry = new THREE.SphereBufferGeometry( 0, 32, 32 );
+					const cube = new THREE.Mesh(geometry, material);
+					cube.position.set(7.15, 32.675+offY, -10.6);
+					
+					manettePivot = new THREE.Group();
+					manettePivot.add(manette);
+					
+					cube.add(manettePivot);
+					scene.add(cube);
 			},
 	);
 }
@@ -297,22 +310,12 @@ function onMouseMove(e){
 
 function dragManette(e) {
 	// New z
-	console.log("dragManette");
-	let z = manette.rotation.x + (e.clientX - mouseDownPos.x)/50;
+	let z = -(e.clientY - mouseDownPos.y)/35 + manettePivot.rotation.z;
 	// Bornes (0 <= z <= 3.14)
 	z = z > 3.14 ? 3.14 : z;
 	z = z < 0 ? 0 : z;
-	//manette.rotation.x = z;
-	//for (let i=0; i<manette.children.length; i++) {
-	//	manette.children[i].rotation.x = z;
-	//}
-	//let point = new THREE.Vector3(manette.children[5].position.x, manette.children[5].position.y, manette.children[5].position.z);
-	let point = new THREE.Vector3(8, 7 + 7, -10.6);
-				
-	rotateAboutPoint(manette, point, new THREE.Vector3(1, 0, 0), z, false);
-
-	mouseDownPos.x = e.clientX;
-	console.log(manette.position);
+	manettePivot.rotation.z = z;
+	mouseDownPos.y = e.clientY;
 }
 
 function dragTiroir(e) {
@@ -324,31 +327,6 @@ function dragTiroir(e) {
 	selectedDrawer.rotation.z = z;
 	mouseDownPos.x = e.clientX;
 }
-
-// obj - your object (THREE.Object3D or derived)
-// point - the point of rotation (THREE.Vector3)
-// axis - the axis of rotation (normalized THREE.Vector3)
-// theta - radian value of rotation
-// pointIsWorld - boolean indicating the point is in world coordinates (default = false)
-function rotateAboutPoint(obj, point, axis, theta, pointIsWorld){
-	console.log(point);
-    pointIsWorld = (pointIsWorld === undefined)? false : pointIsWorld;
-
-    if(pointIsWorld){
-        obj.parent.localToWorld(obj.position); // compensate for world coordinate
-    }
-
-    obj.position.sub(point); // remove the offset
-    obj.position.applyAxisAngle(axis, theta); // rotate the POSITION
-    obj.position.add(point); // re-add the offset
-
-    if(pointIsWorld){
-        obj.parent.worldToLocal(obj.position); // undo world coordinates compensation
-    }
-
-    obj.rotateOnAxis(axis, theta); // rotate the OBJECT
-}
-
 
 document.addEventListener("mousedown", onMouseDown);
 document.addEventListener("mouseup", onMouseUp);
