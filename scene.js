@@ -139,6 +139,8 @@ function  loadPannel(loader){
 					collada.scene.rotation.x = 0;
 					collada.scene.rotation.y = 3.14/2;
 					collada.scene.rotation.z = 0;
+
+					console.log(collada.scene);
 			},
 	);
 
@@ -190,7 +192,7 @@ function loadCarcass(loader) {
 function loadTiroirs(loader) {
 	loadingTopic = "Chargement des tiroirs";
 	const offTiroir = 1.8;
-	loader.load( 'tiroir.dae', 
+	loader.load( 'tiroir2.dae', 
 	    // Function when resource is loaded
 	    function (collada) {
 			for (let i = 0; i <= 13; i++){
@@ -201,6 +203,7 @@ function loadTiroirs(loader) {
 				drawerClone.position.x -= 0.3;
 				drawers.push(drawerClone);
 			}	   
+			console.log(drawers);
 	    },
 	);
 }
