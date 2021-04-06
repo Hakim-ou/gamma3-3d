@@ -97,9 +97,9 @@ async function updateLoadingProgress(item, loaded, total){
 }
 
 async function removeLoadingScreen(){	
-	document.getElementById('progress-bar').classList.add('fade-out');
-	await sleep(500); // wait for the fade-out transition to end
-	document.getElementById('progress-bar').remove();
+	document.getElementById('loading-screen').classList.add('fade-out');
+	await sleep(400); // wait for the fade-out transition to end
+	document.getElementById('loading-screen').remove();
 }
 
 async function loadModels(loader, manager){
