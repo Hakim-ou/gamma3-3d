@@ -84,6 +84,9 @@ body {
 	width:100%;
     border: 1px solid transparent;
 	cursor: pointer;
+	border: 1px outset #656565;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #343434;
 }
 
 .btn:hover{
@@ -111,6 +114,9 @@ html, body {
 	width:0%;
 	position: absolute;
 	bottom:0%;
+	border: 1px outset #656565;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #343434;
 }
 
 #value{
@@ -133,6 +139,9 @@ html, body {
 	opacity: 1;
 	transition: 0.5s opacity;
 	transform: translateZ(0); 
+	border: 1px outset #656565;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #343434;
 }
 
 #loading-screen.fade-out {

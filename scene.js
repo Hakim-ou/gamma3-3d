@@ -7,6 +7,7 @@ var objects = [], bull2Scene, offY = - 20;
 var drawers = [];
 var manette;
 var manettePivot;
+var carcasse;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let selectedObject;
@@ -32,6 +33,7 @@ function init() {
 
 	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.set( 50, 50, 0 );
+	//console.log(camera);
 
 	// controls
 	controls = new OrbitControls( camera, renderer.domElement );
@@ -55,7 +57,7 @@ function init() {
   	var loader = new ColladaLoader(manager);
 
 
-	loadModels(loader, manager);
+	loadModels(loader);
 
 	// lights
 	var light = new THREE.DirectionalLight( 0xffffff );
@@ -96,7 +98,7 @@ function render() {
 }
 
 async function updateLoadingProgress(item, loaded, total){
-	document.getElementById("value").innerHTML = (loaded / total)*100 + '%';
+	document.getElementById("value").innerHTML = ((loaded / total)*100).toFixed(2) + '%';
 	document.getElementById("bar").style.width = (loaded / total)*100 + '%';
 	if(loaded == total)
 		removeLoadingScreen();
@@ -108,7 +110,7 @@ async function removeLoadingScreen(){
 	document.getElementById('loading-screen').remove();
 }
 
-async function loadModels(loader, manager){
+async function loadModels(loader){
 	loadPannel(loader);
 	loadCarcass(loader);
 	loadTiroirs(loader);
@@ -145,8 +147,7 @@ function  loadPannel(loader){
 					collada.scene.rotation.x = 0;
 					collada.scene.rotation.y = 3.14/2;
 					collada.scene.rotation.z = 0;
-
-					console.log(collada.scene);
+					//console.log(collada.scene);
 			},
 	);
 
@@ -191,6 +192,8 @@ function loadCarcass(loader) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
 			for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
+			carcasse = collada.scene;
+			console.log(carcasse);
 	    },
 	);
 }
@@ -212,7 +215,7 @@ function loadTiroirs(loader) {
 			for (var i=0; i<drawers.length; i++) {
 				drawers[i].children[0].rotation.z = i * 2.0 / drawers.length;
 			}
-			console.log(drawers);
+			//console.log(drawers);
 	    },
 	);
 }
@@ -250,23 +253,41 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Deprecated
-function onClick2(e) {
-	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-
-	raycaster.setFromCamera(mouse, camera);
-	for(let i = 0; i < drawers.length; i++) {
-		if (raycaster.ray.isIntersectionBox(new THREE.Box3().setFromObject(drawers[i]))) {
-			if (drawers[i].closed) {
-				openDrawer(drawers[i]);
-			} else {
-				closeDrawer(drawers[i]);
-			}
-			break;
-		}
-	}
+function vueChange(posX, posY, posZ, upX, upY, upZ) {
+    // console.log (camera.rotation.x, camera.rotation.y, camera.rotation.z )
+    var pasChange = 16;
+    var dPosX = (camera.position.x - posX) / pasChange;
+    var dPosY = (camera.position.y - posY) / pasChange;
+    var dPosZ = (camera.position.z - posZ) / pasChange;
+    var dUpX = (camera.up.x - upX) / pasChange;
+    var dUpY = (camera.up.y - upY) / pasChange;
+    var dUpZ = (camera.up.z - upZ) / pasChange;
+    vueChangeProg(dPosX, dPosY, dPosZ, dUpX, dUpY, dUpZ);
 }
+
+function vueChangeProg(pasChange, dPosX, dPosY, dPosZ, dUpX, dUpY, dUpZ) {
+    var animvueChangeProg = requestAnimationFrame(vueChangeProg);
+    if (pasChange > 0) {
+        camera.position.x -= dPosX;
+        camera.position.y -= dPosY;
+        camera.position.z -= dPosZ; // rotation
+        camera.up.x -= dUpX;
+        camera.up.y -= dUpY;
+        camera.up.z -= dUpZ; // uniquement pivotement de la camera
+        pasChange--;
+    } else {
+        //controls = new THREE.TrackballControls(camera);
+        camera.lookAt(scene.position);
+        window.cancelAnimationFrame(animvueChangeProg);
+    }
+}
+
+function viewGamma3() {
+	var pos = drawers[0].children[0].position;
+	vueChange(pos.x, pos.y, pos.z, pos.x, pos.y, pos.z);
+}
+
+document.getElementById("lookAtGamma3").addEventListener("click", viewGamma3);
 
 function onMouseDown(e){
 	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
