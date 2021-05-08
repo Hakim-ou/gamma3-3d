@@ -61,6 +61,12 @@ function init() {
 	var light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 1, 1, 1 );
 	scene.add( light );
+	const sphereSize = 1;
+	const pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
+	scene.add( pointLightHelper );
+	// panneau ne se voit plus (lumière réfléchit)
+	//var lightAmb = new THREE.AmbientLight(0xffffff)
+	//scene.add(lightAmb)
 
 	var light = new THREE.DirectionalLight( 0x002288 );
 	light.position.set( - 1, - 1, - 1 );
@@ -203,6 +209,9 @@ function loadTiroirs(loader) {
 				drawerClone.position.x -= 0.3;
 				drawers.push(drawerClone);
 			}	   
+			for (var i=0; i<drawers.length; i++) {
+				drawers[i].children[0].rotation.z = i * 2.0 / drawers.length;
+			}
 			console.log(drawers);
 	    },
 	);
@@ -219,7 +228,7 @@ function closeAllDrawers(){
 function openAllDrawers(){
 	for(let i = 0; i < drawers.length; i++){
 		if(drawers[i].children[0].rotation.z > 0)
-			openDrawer(drawers[i].children[0]);
+			openDrawer(i+1, drawers[i].children[0]);
 	}
 }
 
@@ -230,8 +239,8 @@ async function closeDrawer(scene) {
 	}
 }
 
-async function openDrawer(scene) {
-	while (scene.rotation.z > 0) {
+async function openDrawer(i, scene) {
+	while (scene.rotation.z > 0 + i*2.0/drawers.length) {
 		scene.rotation.z -= 0.02;
 		await sleep(1);
 	}
