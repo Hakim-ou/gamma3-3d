@@ -7,7 +7,9 @@ var objects = [], bull2Scene, offY = - 20;
 var drawers = [];
 var manette;
 var manettePivot;
-var carcasse;
+var gamma3;
+var tabulatrice;
+var panneau;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let selectedObject;
@@ -121,16 +123,17 @@ function  loadPannel(loader){
 	loader.load('fix.dae', // panneau de connexion
 			// Function when resource is loaded
 			function (collada) {    // 53 objets
-					scene.add(collada.scene);
-					collada.scene.scale.x = 2.2;
-					collada.scene.scale.y= 2;
-					collada.scene.scale.z = 2;
-					collada.scene.position.x = 8;
-					collada.scene.position.y = 27 + offY;
-					collada.scene.position.z = -10.6;
-					collada.scene.rotation.x = 0;
-					collada.scene.rotation.y = 3.14/2;
-					collada.scene.rotation.z = 0;
+				panneau = collada.scene;
+				scene.add(collada.scene);
+				collada.scene.scale.x = 2.2;
+				collada.scene.scale.y= 2;
+				collada.scene.scale.z = 2;
+				collada.scene.position.x = 8;
+				collada.scene.position.y = 27 + offY;
+				collada.scene.position.z = -10.6;
+				collada.scene.rotation.x = 0;
+				collada.scene.rotation.y = 3.14/2;
+				collada.scene.rotation.z = 0;
 			},
 	);
 
@@ -154,46 +157,66 @@ function  loadPannel(loader){
 	loader.load('manette.dae', // manette du panneau de connexion
 			// Function when resource is loaded
 			function (collada) { 
-					//scene.add(collada.scene);
-					manette = collada.scene;
-					collada.scene.scale.x = 2.2;
-					collada.scene.scale.y= 2;
-					collada.scene.scale.z = 2;
-					collada.scene.position.y -= 5.675;
-					collada.scene.position.x = 0.86;
-					collada.scene.rotation.x = 0;
-					collada.scene.rotation.y = 3.14/2;
-					collada.scene.rotation.z = 0;
+				manette = collada.scene;
+				collada.scene.scale.x = 2.2;
+				collada.scene.scale.y= 2;
+				collada.scene.scale.z = 2;
+				collada.scene.position.y -= 5.675;
+				collada.scene.position.x = 0.86;
+				collada.scene.rotation.x = 0;
+				collada.scene.rotation.y = 3.14/2;
+				collada.scene.rotation.z = 0;
 
-					// Manette pivot
-					const material = new THREE.MeshPhongMaterial({
-						color: null,
-						opacity: 0,
-						transparent: true,
-					  });
-					var geometry = new THREE.SphereBufferGeometry( 0, 32, 32 );
-					const cube = new THREE.Mesh(geometry, material);
-					cube.position.set(7.15, 32.675+offY, -10.6);
-					
-					manettePivot = new THREE.Group();
-					manettePivot.add(manette);
-					
-					cube.add(manettePivot);
-					scene.add(cube);
+				// Manette pivot
+				const material = new THREE.MeshPhongMaterial({
+					color: null,
+					opacity: 0,
+					transparent: true,
+				  });
+				var geometry = new THREE.SphereBufferGeometry( 0, 32, 32 );
+				const cube = new THREE.Mesh(geometry, material);
+				cube.position.set(7.15, 32.675+offY, -10.6);
+				
+				manettePivot = new THREE.Group();
+				manettePivot.add(manette);
+				
+				cube.add(manettePivot);
+				scene.add(cube);
 			},
 	);
 }
 
 function loadCarcass(loader) {
 	loadingTopic = "Chargement de la carcasse";
-	loader.load( 'carcasse.dae',
+	// loading gamma 3
+	loader.load( 'gamma3.dae',
+	    // Function when resource is loaded
+	    function (collada) {
+			gamma3 = collada.scene;
+			scene.add(collada.scene) ;
+			collada.scene.position.y += offY ;
+			for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
+	    },
+	);
+
+	// loading bull 3 (tabulatrice)
+	loader.load( 'tabulatrice.dae',
+	    // Function when resource is loaded
+	    function (collada) {
+			tabulatrice = collada.scene;
+			scene.add(collada.scene) ;
+			collada.scene.position.y += offY ;
+			for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
+	    },
+	);
+
+	// loading connections between gamma3 and bull 3
+	loader.load( 'connections.dae',
 	    // Function when resource is loaded
 	    function (collada) {
 			scene.add(collada.scene) ;
 			collada.scene.position.y += offY ;
 			for(var i = 0 ; i < collada.scene.children.length ; i++){ objects.push(collada.scene.children[i]);} // 123 objects
-			carcasse = collada.scene;
-			console.log(carcasse);
 	    },
 	);
 }
@@ -215,8 +238,7 @@ function loadTiroirs(loader) {
 			for (var i=0; i<drawers.length; i++) {
 				drawers[i].children[0].rotation.z = i * 2.0 / drawers.length;
 			}
-			//console.log(drawers);
-	    },
+		},
 	);
 }
 
@@ -283,11 +305,35 @@ function vueChangeProg(pasChange, dPosX, dPosY, dPosZ, dUpX, dUpY, dUpZ) {
 }
 
 function viewGamma3() {
-	var pos = drawers[0].children[0].position;
-	vueChange(pos.x, pos.y, pos.z, pos.x, pos.y, pos.z);
+	var pos = gamma3.position;
+	camera.position.x = pos.x + 50;
+	camera.position.y = pos.y + 30;
+	camera.position.z = pos.z;
+
+	camera.up.x = -1;
+	camera.up.y = 0;
+	camera.up.z = 0;
+
+	camera.lookAt(pos);
+	console.log("camera position:", camera.position);
+}
+
+function viewPannel() {
+	var pos = panneau.position;
+	camera.position.x = pos.x + 10;
+	camera.position.y = pos.y;
+	camera.position.z = pos.z;
+
+	camera.up.x = -1;
+	camera.up.y = 0;
+	camera.up.z = 0;
+
+	camera.lookAt(pos);
+	console.log("camera position:", camera);
 }
 
 document.getElementById("lookAtGamma3").addEventListener("click", viewGamma3);
+document.getElementById("lookAtPannel").addEventListener("click", viewPannel);
 
 function onMouseDown(e){
 	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
