@@ -275,73 +275,47 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function vueChange(posX, posY, posZ, upX, upY, upZ) {
-    // console.log (camera.rotation.x, camera.rotation.y, camera.rotation.z )
-    var pasChange = 16;
-    var dPosX = (camera.position.x - posX) / pasChange;
-    var dPosY = (camera.position.y - posY) / pasChange;
-    var dPosZ = (camera.position.z - posZ) / pasChange;
-    var dUpX = (camera.up.x - upX) / pasChange;
-    var dUpY = (camera.up.y - upY) / pasChange;
-    var dUpZ = (camera.up.z - upZ) / pasChange;
-    vueChangeProg(dPosX, dPosY, dPosZ, dUpX, dUpY, dUpZ);
-}
-
-function vueChangeProg(pasChange, dPosX, dPosY, dPosZ, dUpX, dUpY, dUpZ) {
-    var animvueChangeProg = requestAnimationFrame(vueChangeProg);
-    if (pasChange > 0) {
-        camera.position.x -= dPosX;
-        camera.position.y -= dPosY;
-        camera.position.z -= dPosZ; // rotation
-        camera.up.x -= dUpX;
-        camera.up.y -= dUpY;
-        camera.up.z -= dUpZ; // uniquement pivotement de la camera
-        pasChange--;
-    } else {
-        //controls = new THREE.TrackballControls(camera);
-        camera.lookAt(scene.position);
-        window.cancelAnimationFrame(animvueChangeProg);
-    }
-}
-
 function viewGamma3() {
 	var pos = gamma3.position;
-
-	//camera.position.x = pos.x + 50;
-	//camera.position.y = pos.y + 30;
-	//camera.position.z = pos.z;
-	//camera.up.x = -1;
-	//camera.up.y = 0;
-	//camera.up.z = 0;
-	//camera.lookAt(pos);
-
-	camera.position.set(pos.x + 50, pos.y + 18, pos.z);
-	controls.target = new THREE.Vector3(pos.x, pos.y + 18, pos.z)
-	console.log("camera position:", camera.position);
+	//camera.position.set(pos.x + 50, pos.y + 18, pos.z);
+	//controls.target = new THREE.Vector3(pos.x, pos.y + 18, pos.z)
+	motionMove(new THREE.Vector3(pos.x + 50, pos.y + 10, pos.z), new THREE.Vector3(pos.x, pos.y + 18, pos.z));
 }
 
 function viewPannel() {
 	var pos = panneau.position;
-
-	//camera.position.x = pos.x + 20;
-	//camera.position.y = pos.y + 5;
-	//camera.position.z = pos.z + 3;
-	//camera.up.x = -50;
-	//camera.up.y = 0;
-	//camera.up.z = 0;
-	//camera.rotation.set(0, 0, 0);
-	//camera.lookAt(pos.x, pos.y, pos.z);
-
-	camera.position.set(pos.x + 10, pos.y, pos.z);
-	controls.target = new THREE.Vector3(pos.x, pos.y, pos.z)
-	console.log("camera position:", camera);
+	//camera.position.set(pos.x + 10, pos.y, pos.z);
+	//controls.target = new THREE.Vector3(pos.x, pos.y, pos.z)
+	motionMove(new THREE.Vector3(pos.x + 10, pos.y, pos.z), new THREE.Vector3(pos.x, pos.y, pos.z));
 }
 
 function viewTabulatrice() {
 	var pos = tabulatrice.position;
-	camera.position.set(pos.x + 65, pos.y + 20, pos.z - 15);
-	controls.target = new THREE.Vector3(pos.x + 65, pos.y + 15, pos.z - 80);
-	console.log("camera position:", camera);
+	//camera.position.set(pos.x + 65, pos.y + 20, pos.z - 15);
+	//controls.target = new THREE.Vector3(pos.x + 65, pos.y + 15, pos.z - 80);
+	motionMove(new THREE.Vector3(pos.x + 65, pos.y + 20, pos.z - 15), new THREE.Vector3(pos.x + 65, pos.y + 15, pos.z - 80));
+}
+
+async function motionMove(position, target) {
+	console.log(position);
+	var dpos = {x:(position.x - camera.position.x)*1.0/2, y:(position.y - camera.position.y)*1.0/2, z:(position.z - camera.position.z)*1.0/2};
+	var dposSign = {x:Math.sign(position.x - camera.position.x), y:Math.sign(position.y - camera.position.y), z:Math.sign(position.z - camera.position.z)};
+	var dtar = {x:(target.x - controls.target.x)*1.0/2, y:(target.y - controls.target.y)*1.0/2, z:(target.z - controls.target.z)*1.0/2};
+	var dtarSign = {x:Math.sign(target.x - controls.target.x), y:Math.sign(target.y - controls.target.y), z:Math.sign(target.z - controls.target.z)};
+	while (dpos.x * dposSign.x > 0 || dpos.y * dposSign.y > 0 || dpos.z * dposSign.z > 0) {
+		if (dpos.x * dposSign.x > 0) {camera.position.x += 2 * dposSign.x; dpos.x -= dposSign.x;}
+		if (dpos.y * dposSign.y > 0) {camera.position.y += 2 * dposSign.y; dpos.y -= dposSign.y;}
+		if (dpos.z * dposSign.z > 0) {camera.position.z += 2 * dposSign.z; dpos.z -= dposSign.z;}
+		await sleep(1);
+	}
+	while (dtar.x * dtarSign.x > 0 || dtar.y * dtarSign.y > 0 || dtar.z * dtarSign.z > 0) {
+		if (dtar.x * dtarSign.x > 0) {controls.target.x += 2 * dtarSign.x; dtar.x -= dtarSign.x;}
+		if (dtar.y * dtarSign.y > 0) {controls.target.y += 2 * dtarSign.y; dtar.y -= dtarSign.y;}
+		if (dtar.z * dtarSign.z > 0) {controls.target.z += 2 * dtarSign.z; dtar.z -= dtarSign.z;}
+		await sleep(1);
+	}
+	console.log("dpos: ", dpos);
+	console.log(camera.position);
 }
 
 document.getElementById("lookAtGamma3").addEventListener("click", viewGamma3);
