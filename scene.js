@@ -306,34 +306,47 @@ function vueChangeProg(pasChange, dPosX, dPosY, dPosZ, dUpX, dUpY, dUpZ) {
 
 function viewGamma3() {
 	var pos = gamma3.position;
-	camera.position.x = pos.x + 50;
-	camera.position.y = pos.y + 30;
-	camera.position.z = pos.z;
 
-	camera.up.x = -1;
-	camera.up.y = 0;
-	camera.up.z = 0;
+	//camera.position.x = pos.x + 50;
+	//camera.position.y = pos.y + 30;
+	//camera.position.z = pos.z;
+	//camera.up.x = -1;
+	//camera.up.y = 0;
+	//camera.up.z = 0;
+	//camera.lookAt(pos);
 
-	camera.lookAt(pos);
+	camera.position.set(pos.x + 50, pos.y + 18, pos.z);
+	controls.target = new THREE.Vector3(pos.x, pos.y + 18, pos.z)
 	console.log("camera position:", camera.position);
 }
 
 function viewPannel() {
 	var pos = panneau.position;
-	camera.position.x = pos.x + 10;
-	camera.position.y = pos.y;
-	camera.position.z = pos.z;
 
-	camera.up.x = -1;
-	camera.up.y = 0;
-	camera.up.z = 0;
+	//camera.position.x = pos.x + 20;
+	//camera.position.y = pos.y + 5;
+	//camera.position.z = pos.z + 3;
+	//camera.up.x = -50;
+	//camera.up.y = 0;
+	//camera.up.z = 0;
+	//camera.rotation.set(0, 0, 0);
+	//camera.lookAt(pos.x, pos.y, pos.z);
 
-	camera.lookAt(pos);
+	camera.position.set(pos.x + 10, pos.y, pos.z);
+	controls.target = new THREE.Vector3(pos.x, pos.y, pos.z)
+	console.log("camera position:", camera);
+}
+
+function viewTabulatrice() {
+	var pos = tabulatrice.position;
+	camera.position.set(pos.x + 65, pos.y + 20, pos.z - 15);
+	controls.target = new THREE.Vector3(pos.x + 65, pos.y + 15, pos.z - 80);
 	console.log("camera position:", camera);
 }
 
 document.getElementById("lookAtGamma3").addEventListener("click", viewGamma3);
 document.getElementById("lookAtPannel").addEventListener("click", viewPannel);
+document.getElementById("lookAtTabulatrice").addEventListener("click", viewTabulatrice);
 
 function onMouseDown(e){
 	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
