@@ -330,8 +330,8 @@ async function motionMove(position, target) {
 		if (dtar.z * dtarSign.z > 0) {controls.target.z += 2 * dtarSign.z; dtar.z -= dtarSign.z;}
 		await sleep(1);
 	}
-	console.log("dpos: ", dpos);
-	console.log(camera.position);
+	//console.log("dpos: ", dpos);
+	//console.log(camera.position);
 }
 
 document.getElementById("lookAtGamma3").addEventListener("click", viewGamma3);
