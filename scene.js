@@ -10,6 +10,7 @@ var manettePivot;
 var gamma3;
 var tabulatrice;
 var panneau;
+var surLePanneau;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let selectedObject;
@@ -69,8 +70,8 @@ function init() {
 	const pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
 	scene.add( pointLightHelper );
 	// panneau ne se voit plus (lumière réfléchit)
-	//var lightAmb = new THREE.AmbientLight(0xffffff)
-	//scene.add(lightAmb)
+	var lightAmb = new THREE.AmbientLight(0xffffff, 0.2);
+	scene.add(lightAmb);
 
 	var light = new THREE.DirectionalLight( 0x002288 );
 	light.position.set( - 1, - 1, - 1 );
@@ -134,6 +135,10 @@ function  loadPannel(loader){
 				collada.scene.rotation.x = 0;
 				collada.scene.rotation.y = 3.14/2;
 				collada.scene.rotation.z = 0;
+
+				let size = new THREE.Vector3(5.5, 10, 0.1);
+				let pos = new THREE.Vector3(panneau.position.x + 0.3, panneau.position.y, panneau.position.z);
+				surLePanneau = transparentScreen(pos, panneau.rotation, size, "surLePanneau");
 			},
 	);
 
@@ -184,6 +189,17 @@ function  loadPannel(loader){
 				scene.add(cube);
 			},
 	);
+}
+
+function transparentScreen(pos, rot, size, name) {
+	var mat = new THREE.MeshLambertMaterial( { color: 0x666666, opacity: 0.2, transparent:true, visible: false } );
+	var geom = new THREE.BoxGeometry(size.x, size.y, size.z);
+	var screen = new THREE.Mesh( geom, mat );
+	screen.name = name;
+	scene.add(screen );
+	screen.position.set(pos.x, pos.y, pos.z);
+	screen.rotation.set(rot.x, rot.y, rot.z);
+	return screen;
 }
 
 function loadCarcass(loader) {
@@ -355,6 +371,14 @@ function onMouseDown(e){
 }
 
 function onMouseUp(e){
+	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+	raycaster.setFromCamera(mouse, camera);
+	let objects = [surLePanneau];
+	const intersects = raycaster.intersectObjects( objects );
+	if ( intersects.length > 0 ) 
+		window.open('https://www.aconit.org/histoire/Gamma-3/Tableau_de_connexion/', '_blank');
 	// Disable drawer drag
 	selectedObject = null;
 	// Enable camera controls
@@ -362,6 +386,7 @@ function onMouseUp(e){
 }
 
 function onMouseMove(e){
+	hoverPannel(e);
 	if(selectedObject) {
 		for (let i=0; i<manette.children.length; i++) { // 10 objects
 			if (Object.is(selectedObject, manette.children[i])) {
@@ -371,6 +396,24 @@ function onMouseMove(e){
 		}
 		selectedDrawer = selectedObject;
 		dragTiroir(e);
+	}
+}
+
+function hoverPannel(e){
+	mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+	raycaster.setFromCamera(mouse, camera);
+	let objects = [surLePanneau];
+	const intersects = raycaster.intersectObjects( objects );
+	if ( intersects.length > 0 ) {
+		surLePanneau.material.visible = true;
+		document.body.style.cursor = 'pointer';
+		//console.log("intersect pannel");
+	} else {
+		surLePanneau.material.visible = false;
+		document.body.style.cursor = 'default';
+		//console.log("no intersection with pannel");
 	}
 }
 
