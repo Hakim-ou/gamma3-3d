@@ -192,7 +192,7 @@ function  loadPannel(loader){
 }
 
 function transparentScreen(pos, rot, size, name) {
-	var mat = new THREE.MeshLambertMaterial( { color: 0x666666, opacity: 0.2, transparent:true, visible: false } );
+	var mat = new THREE.MeshLambertMaterial( { color: 0x000000, opacity: 0.4, transparent:true, visible: false } );
 	var geom = new THREE.BoxGeometry(size.x, size.y, size.z);
 	var screen = new THREE.Mesh( geom, mat );
 	screen.name = name;
@@ -295,7 +295,7 @@ function viewGamma3() {
 	var pos = gamma3.position;
 	//camera.position.set(pos.x + 50, pos.y + 18, pos.z);
 	//controls.target = new THREE.Vector3(pos.x, pos.y + 18, pos.z)
-	motionMove(new THREE.Vector3(pos.x + 50, pos.y + 10, pos.z), new THREE.Vector3(pos.x, pos.y + 18, pos.z));
+	motionMove(new THREE.Vector3(pos.x + 50, pos.y + 18, pos.z), new THREE.Vector3(pos.x, pos.y + 18, pos.z));
 }
 
 function viewPannel() {
