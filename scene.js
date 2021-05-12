@@ -109,7 +109,7 @@ async function updateLoadingProgress(item, loaded, total){
 
 async function removeLoadingScreen(){	
 	document.getElementById('loading-screen').classList.add('fade-out');
-	await sleep(400); // wait for the fade-out transition to end
+	await sleep(3000); // wait for the fade-out transition to end
 	document.getElementById('loading-screen').remove();
 }
 

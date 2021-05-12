@@ -137,7 +137,7 @@ html, body {
 	border-radius: 0.25em;
 	opacity:1;
 	opacity: 1;
-	transition: 0.5s opacity;
+	transition: opacity 3s ease-out;
 	transform: translateZ(0); 
 	border: 1px outset #656565;
     border-radius: 10px;
@@ -155,5 +155,5 @@ html, body {
 	position: absolute;
 	z-index: 2;
 	opacity: 1;
-	transition: 0.5s opacity;
+	transition: 3s opacity;
 }
