@@ -387,6 +387,7 @@ function onMouseUp(e){
 
 function onMouseMove(e){
 	hoverPannel(e);
+	describeDrawer(e);
 	if(selectedObject) {
 		for (let i=0; i<manette.children.length; i++) { // 10 objects
 			if (Object.is(selectedObject, manette.children[i])) {
@@ -415,6 +416,29 @@ function hoverPannel(e){
 		document.body.style.cursor = 'default';
 		//console.log("no intersection with pannel");
 	}
+}
+
+function describeDrawer(e) {
+	mouse.x = e.clientX + document.body.scrollLeft;
+	mouse.y = e.clientY + document.body.scrollTop;
+
+	let description = document.getElementById("drawerDescription");
+	let objects = []
+	for(let i = 0; i < drawers.length; i++){
+		objects.push(...drawers[i].children);
+	}
+
+	// calculate drawers intersecting the picking ray
+	const intersects = raycaster.intersectObjects( objects );
+
+	if(intersects.length){ // If we have intersections with at least one drawer
+		description.style.display = "block";
+		description.style.top = mouse.y + "px";
+		description.style.left = mouse.x + "px";
+	} else {
+		description.style.display = "none";
+	}
+
 }
 
 function dragManette(e) {
